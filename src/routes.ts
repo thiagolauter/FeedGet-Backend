@@ -9,16 +9,22 @@ export const routes = express.Router()
 routes.post('/feedbacks', async (req, res) => {
     const { type, comment, screenshot } = req.body
 
-    const prismaFeedbacksRepository = new PrismaFeedbacksRepository()
-    const nodemailerMailAdapter = new NodemailerMailAdapter()
-    const submitFeedbackUseCase = new SubmitFeedbackUseCase(
-        prismaFeedbacksRepository,
-        nodemailerMailAdapter
-    )
+    try {
+        const prismaFeedbacksRepository = new PrismaFeedbacksRepository()
+        const nodemailerMailAdapter = new NodemailerMailAdapter()
 
-    await submitFeedbackUseCase.execute({
-        type, comment, screenshot
-    })
+        const submitFeedbackUseCase = new SubmitFeedbackUseCase(
+            prismaFeedbacksRepository,
+            nodemailerMailAdapter
+        )
 
-    return res.status(201).send()
+        await submitFeedbackUseCase.execute({
+            type, comment, screenshot
+        })
+
+        return res.status(201).send()
+    } catch (err) {
+        return res.status(500).send();
+    }
+
 })
